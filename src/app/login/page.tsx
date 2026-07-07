@@ -9,7 +9,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/account";
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -21,6 +21,19 @@ function LoginForm() {
     setBusy(true);
     setMessage(null);
     const supabase = createClient();
+
+    if (mode === "forgot") {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${location.origin}/auth/callback?next=/reset-password`,
+      });
+      setMessage(
+        error
+          ? error.message
+          : "Reset link sent! Check your email (and spam folder), then click the link to set a new password."
+      );
+      setBusy(false);
+      return;
+    }
 
     if (mode === "signin") {
       const { error } = await supabase.auth.signInWithPassword({
@@ -59,12 +72,18 @@ function LoginForm() {
     <div className="flex flex-1 flex-col items-center justify-center bg-amber-50 px-6 py-12 dark:bg-zinc-950">
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-          {mode === "signin" ? "Sign in to FoodVibe" : "Create your account"}
+          {mode === "signin"
+            ? "Sign in to FoodVibe"
+            : mode === "signup"
+              ? "Create your account"
+              : "Reset your password"}
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           {mode === "signin"
             ? "Welcome back."
-            : "Free forever. No commission, no tricks."}
+            : mode === "signup"
+              ? "Free forever. No commission, no tricks."
+              : "We'll email you a link to set a new password."}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
@@ -90,17 +109,19 @@ function LoginForm() {
               className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-base text-zinc-900 outline-none focus:border-amber-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Password
-            <input
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-base text-zinc-900 outline-none focus:border-amber-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-            />
-          </label>
+          {mode !== "forgot" && (
+            <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              Password
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-base text-zinc-900 outline-none focus:border-amber-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              />
+            </label>
+          )}
 
           {message && (
             <p className="rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
@@ -117,11 +138,13 @@ function LoginForm() {
               ? "Working…"
               : mode === "signin"
                 ? "Sign in"
-                : "Create account"}
+                : mode === "signup"
+                  ? "Create account"
+                  : "Send reset link"}
           </button>
         </form>
 
-        <div className="mt-4 flex items-center justify-between text-sm">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm">
           <button
             type="button"
             onClick={() => {
@@ -134,6 +157,18 @@ function LoginForm() {
               ? "New here? Create an account"
               : "Have an account? Sign in"}
           </button>
+          {mode === "signin" && (
+            <button
+              type="button"
+              onClick={() => {
+                setMode("forgot");
+                setMessage(null);
+              }}
+              className="text-zinc-500 underline dark:text-zinc-400"
+            >
+              Forgot password?
+            </button>
+          )}
           <Link
             href="/"
             className="text-zinc-500 underline dark:text-zinc-400"
