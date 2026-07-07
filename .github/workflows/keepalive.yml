@@ -1,0 +1,20 @@
+# Supabase pauses free projects after ~1 week without traffic.
+# This pings the API every 3 days so FoodVibe never sleeps.
+# The key below is the *publishable* key — public by design.
+name: Keep Supabase awake
+
+on:
+  schedule:
+    - cron: "0 6 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          curl --fail --silent --show-error \
+            -H "apikey: sb_publishable_h3szXK6GXB6_nZhmVFSmCw_e2AYH8YM" \
+            "https://awrfwjkyfcimpodsmbzj.supabase.co/rest/v1/" > /dev/null
+          echo "Supabase pinged successfully"
