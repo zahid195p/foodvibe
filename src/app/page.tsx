@@ -33,6 +33,14 @@ export default function Home() {
             Open-source, zero-commission food delivery for Pakistan. No cut
             from restaurants, riders, or buyers — ever.
           </p>
+          <div>
+            <Link
+              href="/login"
+              className="inline-block rounded-lg bg-amber-700 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-amber-800"
+            >
+              Sign in / Create account
+            </Link>
+          </div>
         </header>
 
         <section className="flex flex-col gap-3">
