@@ -131,10 +131,10 @@ export default function RiderPortal() {
           Deliver with FoodVibe — keep 100% of every delivery fee and tip.
         </p>
         <Link
-          href="/login?next=/rider"
+          href="/rider/login"
           className="rounded-lg bg-amber-700 px-5 py-2.5 font-semibold text-white hover:bg-amber-800"
         >
-          Sign in to get started
+          Rider sign in
         </Link>
       </div>
     );

@@ -186,10 +186,10 @@ export default function RestaurantPortal() {
           yours.
         </p>
         <Link
-          href="/login?next=/restaurant"
+          href="/restaurant/login"
           className="rounded-lg bg-amber-700 px-5 py-2.5 font-semibold text-white hover:bg-amber-800"
         >
-          Sign in to get started
+          Partner sign in
         </Link>
       </Gate>
     );

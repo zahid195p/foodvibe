@@ -44,6 +44,20 @@ export default async function AccountPage() {
             </dd>
           </div>
         </dl>
+        {profile?.role && profile.role !== "buyer" && (
+          <Link
+            href={
+              profile.role === "admin"
+                ? "/admin"
+                : profile.role === "restaurant"
+                  ? "/restaurant"
+                  : "/rider"
+            }
+            className="mt-4 block rounded-lg bg-amber-700 px-4 py-2.5 text-center font-semibold text-white hover:bg-amber-800"
+          >
+            Open my dashboard →
+          </Link>
+        )}
         <div className="mt-6 flex items-center justify-between">
           <Link
             href="/"

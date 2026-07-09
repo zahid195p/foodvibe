@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// Email confirmation links land here with a one-time code that we
+// Same-browser email links land here with a one-time code that we
 // exchange for a real session.
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -12,9 +12,32 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      let dest = next;
+      // Generic destination? Land the user where their role actually works.
+      if (dest === "/account" || dest === "/") {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .maybeSingle();
+          const role = profile?.role;
+          dest =
+            role === "admin"
+              ? "/admin"
+              : role === "restaurant"
+                ? "/restaurant"
+                : role === "rider"
+                  ? "/rider"
+                  : "/";
+        }
+      }
+      return NextResponse.redirect(`${origin}${dest}`);
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=confirmation`);
+  return NextResponse.redirect(`${origin}/login?error=link`);
 }

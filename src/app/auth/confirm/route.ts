@@ -16,7 +16,30 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({ type, token_hash });
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      let dest = next;
+      // Generic destination? Land the user where their role actually works.
+      if (dest === "/account" || dest === "/") {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .maybeSingle();
+          const role = profile?.role;
+          dest =
+            role === "admin"
+              ? "/admin"
+              : role === "restaurant"
+                ? "/restaurant"
+                : role === "rider"
+                  ? "/rider"
+                  : "/";
+        }
+      }
+      return NextResponse.redirect(`${origin}${dest}`);
     }
   }
 

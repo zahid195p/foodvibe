@@ -3,10 +3,10 @@
 import { Suspense } from "react";
 import { AuthForm } from "@/components/auth-form";
 
-export default function LoginPage() {
+export default function RestaurantLoginPage() {
   return (
     <Suspense>
-      <AuthForm audience="buyer" />
+      <AuthForm audience="restaurant" />
     </Suspense>
   );
 }
