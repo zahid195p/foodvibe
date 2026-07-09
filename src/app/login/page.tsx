@@ -9,6 +9,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/account";
+  const linkError = searchParams.get("error");
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -126,6 +127,13 @@ function LoginForm() {
           {message && (
             <p className="rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
               {message}
+            </p>
+          )}
+          {linkError && !message && (
+            <p className="rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+              That email link didn&apos;t work — it may have expired or been
+              used already. Sign in normally, or use &ldquo;Forgot
+              password?&rdquo; to get a fresh link.
             </p>
           )}
 
